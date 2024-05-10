@@ -11,4 +11,6 @@
     range-array
   )))
 
-(defun time-array-access (n) (let ((x (range n))) (time (aref x (- n 1)))))
+(defun time-array-access (n) 
+  (let ((x (range n)))
+    (time (aref x (- n 1)))))
