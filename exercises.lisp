@@ -14,3 +14,23 @@
 (defun time-array-access (n) 
   (let ((x (range n)))
     (time (aref x (- n 1)))))
+
+(defun behave (animal) (funcall (get animal 'behavior)))
+(setf (get 'dog 'behavior) #'(lambda () (print "5")))
+
+(let ((counter 0))
+  (defun new-id () (incf counter))
+  (defun reset-id () (setq counter 0)))
+
+(defun custom-adder (x)
+  #'(lambda (n &optional t)
+      (if t) (setq n x)
+      (+ x n)))
+
+(defun count-instances (obj lsts)
+  (labels ((instances-in (lst) 
+    (if (consp lst) 
+      (+ (if (eq (car lst) obj) 1 0)
+         (instances-in (cdr lst)))
+      0)))
+      (mapcar #'instances-in lsts)))
