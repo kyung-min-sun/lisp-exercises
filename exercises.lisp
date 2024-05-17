@@ -42,6 +42,11 @@
     (if (null lst) 
       (values 0 acc)
       (multiple-value-bind (len acc2) (rev (cdr lst) (cons (car lst) acc))
-      (values acc2 (+ 1 len))
-      ))))
+      (values acc2 (+ 1 len))))))
     (rev lst nil)))
+
+(defun our-remove-if-not (lst val)
+  (if (null lst) lst
+    (if (= (car lst) val)
+      (cons (car lst) (our-remove-if-not (cdr lst) val))
+  (our-remove-if-not (cdr lst) val))))
