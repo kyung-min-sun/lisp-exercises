@@ -40,6 +40,8 @@
 (defun good-reverse (lst)
   (labels ((rev (lst acc) 
     (if (null lst) 
-      acc
-      (rev (cdr lst) (cons (car lst) acc)))))
+      (values 0 acc)
+      (multiple-value-bind (len acc2) (rev (cdr lst) (cons (car lst) acc))
+      (values acc2 (+ 1 len))
+      ))))
     (rev lst nil)))
