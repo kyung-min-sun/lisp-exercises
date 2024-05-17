@@ -22,11 +22,6 @@
   (defun new-id () (incf counter))
   (defun reset-id () (setq counter 0)))
 
-(defun custom-adder (x)
-  #'(lambda (n &optional t)
-      (if t) (setq n x)
-      (+ x n)))
-
 (defun count-instances (obj lsts)
   (labels ((instances-in (lst) 
     (if (consp lst) 
@@ -37,7 +32,14 @@
 
 (defun our-length (lst)
   (labels ((rec (lst acc)
-    (if (null lst)) 
+    (if (null lst)
       acc 
-      (rec (cdr lst) (1+ acc))
-    (rec lst 0)))))
+      (rec (cdr lst) (1+ acc)))))
+    (rec lst 0)))
+
+(defun good-reverse (lst)
+  (labels ((rev (lst acc) 
+    (if (null lst) 
+      acc
+      (rev (cdr lst) (cons (car lst) acc)))))
+    (rev lst nil)))
