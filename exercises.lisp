@@ -51,6 +51,13 @@
       (cons (car lst) (our-remove-if-not (cdr lst) val))
   (our-remove-if-not (cdr lst) val))))
 
+(defun filter (expr lst)
+  (if (null lst) 
+    lst
+    (if (funcall expr (car lst)) 
+      (cons (car lst) (filter expr (cdr lst)))
+      (filter expr (cdr lst)))))
+
 (defun group (source n)
   (if (zerop n) (error "zero length")) 
   (labels ((rec (source acc)
