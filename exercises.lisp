@@ -74,3 +74,12 @@
       (t (rec (car x) (rec (cdr x) acc)))
     )))
   (rec lst nil)))
+
+(defun before (x y lst)
+  (let ((z (car lst))) 
+    (cond ((null x) nil)
+    ((null y) nil)
+    ((null lst) nil)
+    ((eq x z) t)
+    ((eq y z) nil)
+    (t (before x y (cdr lst))))))
