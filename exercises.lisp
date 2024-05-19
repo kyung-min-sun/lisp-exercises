@@ -66,3 +66,11 @@
         (rec rest (cons (subseq source 0 n) acc))
         (nreverse (cons source acc)))))) 
     (if source (rec source nil) nil)))
+  
+(defun flatten (lst)
+  (labels ((rec (x acc)
+    (cond ((null x) acc)
+    ((atom x) (cons x acc))
+      (t (rec (car x) (rec (cdr x) acc)))
+    )))
+  (rec lst nil)))
