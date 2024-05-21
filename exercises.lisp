@@ -81,3 +81,9 @@
           ((eql x z) lst)
           ((eql y z) nil)
           (t (before x y (cdr lst))))))
+
+(defun best (fn lst)
+  (if (null lst) nil
+      (let ((max-value (car lst)))
+        (dolist (obj (cdr lst) max-value)
+          (cond ((funcall fn obj max-value) (setq max-value obj)))))))

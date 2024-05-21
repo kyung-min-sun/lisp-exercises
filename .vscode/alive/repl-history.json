@@ -1,1 +1,1 @@
-[{"pkgName":"cl-user","text":"(good-reverse '(1 2 3 4))"}]
+[{"pkgName":"cl-user","text":"(best #'> '(1 2 3 4 5))"},{"pkgName":"cl-user","text":"(best #'> '(1 2 3 4))"},{"pkgName":"cl-user","text":"(time-array-access 100)"},{"pkgName":"cl-user","text":"(before 'a 'b '(a b c))"},{"pkgName":"cl-user","text":"(group '(1 2 3) 2)"},{"pkgName":"cl-user","text":"(+ 2 2)"},{"pkgName":"cl-user","text":"(good-reverse '(1 2 3 4))"}]
