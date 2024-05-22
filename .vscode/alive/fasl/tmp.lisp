@@ -87,3 +87,6 @@
       (let ((max-value (car lst)))
         (dolist (obj (cdr lst) max-value)
           (cond ((funcall fn obj max-value) (setq max-value obj)))))))
+
+(defun mkstr (&rest args) (with-output-to-string (s)
+                            (dolist (a args) (princ a s))))
