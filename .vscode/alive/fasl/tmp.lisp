@@ -3,7 +3,7 @@
 ;;; how would you implement a hashmap in lisp?
 ;;; how would you implement an O(1) access / push array in lisp? 
 ;;; that's pretty easy actually (use `nth x '(1, 2, 3)`)
-(defun range (max)
+(defun vec-range (max)
   (let ((range-array (make-array max)))
     (progn
      (dotimes (i max)
@@ -92,30 +92,33 @@
                             (dolist (a args) (princ a s))))
 
 (defun memoize (fn)
-  (let ((cache (make-hash-table :test #’equal)))
-    #’(lambda (&rest args)
+  (let ((cache (make-hash-table :test #'equal)))
+    #'(lambda (&rest args)
         (multiple-value-bind (val win) (gethash args cache)
           (if win val
               (setf (gethash args cache) (apply fn args)))))))
 
-(defun potter-kata (books &optional (discounts '(.75 .80 .90 .95 1)))
+(defun range (n)
+  (loop for i from 0 below n
+        collect i))
+
+(defun potter-kata (books &optional (discounts '(.75 .80 .90 .95)))
   "Solution to discounted Harry Potter book problem. https://codingdojo.org/kata/Potter/"
-  (if (null discounts) 0
-      (let ((k 0))
-        (loop
-         (if (every #'lambda (x) (>= x k) books)
-             (potter-kata (mapcar #'lambda (x) (- x k) books) discounts))))))
-
-;; seems like a linear programming problem & you want to minimize cost
-
-;; (5 * .75 * g_5 + 4 * .80 * g_4 + 3 * 0.9 * g_3 + 2 * .95 * g_2 + g_1) * 8
-;; (3.75 * g_5 + 3.2 * g_4 + 2.7 * g_3 + 1.9 * g_2 + g_1) * 8
-;; minimize this function^
-
-;; we could just try all combinations of g_5
-;; we want to maximize multiples of 5
-;; until it's just height 1
-
-;; O(discounts * n) 
-
-  )
+  ;; you want to maximize the weighted average discount
+  ;; reverse sort the array
+  ;; maximize maximum grouping until you're left with 1 copy
+  ;; minimize two cases: 
+  ;; 1. you group this 1 copy 
+  ;; - decrement the rest of the books by 1
+  ;; - recurse to (cdr books) (cdr discounts)
+  ;; 2. you don't group this 1 copy
+  ;; - add this book to the next copy (equivalent to a duplicate book)
+  ;; *** key insight: any k-1 matching's bottleneck will be the next copy (bc it has the lowest quantity)
+  ;; - recurse to (cdr books) (cdr discounts)
+  (if (null discounts) (reduce #'+ books)
+      (progn
+       (reduce #'min
+           (mapcar
+               (lambda (k) (+ (potter-kata (mapcar (lambda (x) (- x k)) books) (cdr discounts))
+                              (* k (car discounts) (1+ (length discounts)))))
+               (range (1+ (reduce #'min books))))))))
