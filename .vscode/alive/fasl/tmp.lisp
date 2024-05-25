@@ -116,14 +116,13 @@
   ;; *** key insight: any k-1 matching's bottleneck will be the next copy (bc it has the lowest quantity)
   ;; - recurse to (cdr books) (cdr discounts)
   (progn
-   (print books)
    (cond ((null books) 0)
          ((null discounts) (reduce #'+ books))
          ((= 1 (length books)) (reduce #'+ books))
          (t (let ((k (1+ (length discounts)))
                   (sorted-books (sort books #'<)))
-              (print sorted-books)
               (if (<= (car sorted-books) 0)
                   (potter-kata (cdr sorted-books) (cdr discounts))
-                  (min (+ (* k (car discounts)) (potter-kata (mapcar #'1- (cdr sorted-books)) (cdr discounts)))
-                    (potter-kata (cons (+ (car sorted-books) (cdar sorted-books)) (cddr sorted-books)) (cdr discounts)))))))))
+                  (progn
+                   (min (+ (* k (car discounts)) (potter-kata (mapcar #'1- (cdr sorted-books)) (cdr discounts)))
+                     (potter-kata (cons (+ (car sorted-books) (car (cdr sorted-books))) (cddr sorted-books)) (cdr discounts))))))))))
