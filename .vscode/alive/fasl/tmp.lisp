@@ -119,10 +119,15 @@
    (cond ((null books) 0)
          ((null discounts) (reduce #'+ books))
          ((= 1 (length books)) (reduce #'+ books))
-         (t (let ((k (1+ (length discounts)))
-                  (sorted-books (sort books #'<)))
+         (t (let ((k (length books))
+                  (sorted-books (sort (copy-list books) #'<)))
               (if (<= (car sorted-books) 0)
                   (potter-kata (cdr sorted-books) (cdr discounts))
-                  (progn
-                   (min (+ (* k (car discounts)) (potter-kata (mapcar #'1- (cdr sorted-books)) (cdr discounts)))
-                     (potter-kata (cons (+ (car sorted-books) (car (cdr sorted-books))) (cddr sorted-books)) (cdr discounts))))))))))
+                  (let ((left (+ (* k (car discounts) (car sorted-books))
+                                 (potter-kata
+                                   (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books))
+                                   (cdr discounts))))
+                        (right (potter-kata
+                                 (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))
+                                 (cdr discounts))))
+                    (min left right))))))))
