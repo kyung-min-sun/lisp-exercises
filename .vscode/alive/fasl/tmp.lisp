@@ -123,11 +123,11 @@
                   (sorted-books (sort (copy-list books) #'<)))
               (if (<= (car sorted-books) 0)
                   (potter-kata (cdr sorted-books) (cdr discounts))
-                  (let ((left (+ (* k (car discounts) (car sorted-books))
-                                 (potter-kata
-                                   (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books))
-                                   (cdr discounts))))
-                        (right (potter-kata
-                                 (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))
-                                 (cdr discounts))))
-                    (min left right))))))))
+                  (let ((best-grouped (+ (* k (car discounts) (car sorted-books))
+                                         (potter-kata
+                                           (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books))
+                                           (cdr discounts))))
+                        (best-ungrouped (potter-kata
+                                          (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))
+                                          (cdr discounts))))
+                    (min best-grouped best-ungrouped))))))))
