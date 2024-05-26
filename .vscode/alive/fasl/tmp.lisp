@@ -102,32 +102,65 @@
   (loop for i from 0 below n
         collect i))
 
-(defun potter-kata (books &optional (discounts '(.75 .80 .90 .95)))
+(defun potter-kata-helper (books &optional (discounts '(.75 .80 .90 .95)))
   "Solution to discounted Harry Potter book problem. https://codingdojo.org/kata/Potter/"
-  ;; you want to maximize the weighted average discount
-  ;; reverse sort the array
-  ;; maximize maximum grouping until you're left with 1 copy
-  ;; minimize two cases: 
-  ;; 1. you group this 1 copy 
-  ;; - decrement the rest of the books by 1
-  ;; - recurse to (cdr books) (cdr discounts)
-  ;; 2. you don't group this 1 copy
-  ;; - add this book to the next copy (equivalent to a duplicate book)
-  ;; *** key insight: any k-1 matching's bottleneck will be the next copy (bc it has the lowest quantity)
-  ;; - recurse to (cdr books) (cdr discounts)
+  (cond ((null books) 0)
+        ((null discounts) (reduce #'+ books))
+        ((= 1 (length books)) (reduce #'+ books))
+        (t (let ((k (length books))
+                 (sorted-books (sort (copy-list books) #'<))
+                 (grouped (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books)))
+                 (ungrouped
+                  (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))))
+             (if (<= (car sorted-books) 0)
+                 (potter-kata-helper (cdr sorted-books) (cdr discounts))
+                 (let ((best-grouped (+ (* k (car discounts) (car sorted-books))
+                                        (potter-kata-helper 'grouped (cdr discounts))))
+                       (best-ungrouped (potter-kata-helper 'ungrouped (cdr discounts))))
+                   (min best-grouped best-ungrouped)))))))
+
+(defun process-book-list (books)
+  (reduce
+      #'(lambda (acc n) (progn (incf (nth n acc)) acc))
+    books
+    :initial-value (list 0 0 0 0 0)))
+
+(defun potter-kata (books)
+  (if (null books) 0
+      (* 8 (potter-kata-helper (process-book-list books)))))
+
+(defun kata-test (fn args expected)
   (progn
-   (cond ((null books) 0)
-         ((null discounts) (reduce #'+ books))
-         ((= 1 (length books)) (reduce #'+ books))
-         (t (let ((k (length books))
-                  (sorted-books (sort (copy-list books) #'<)))
-              (if (<= (car sorted-books) 0)
-                  (potter-kata (cdr sorted-books) (cdr discounts))
-                  (let ((best-grouped (+ (* k (car discounts) (car sorted-books))
-                                         (potter-kata
-                                           (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books))
-                                           (cdr discounts))))
-                        (best-ungrouped (potter-kata
-                                          (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))
-                                          (cdr discounts))))
-                    (min best-grouped best-ungrouped))))))))
+   (format t "Testing ~A... " args)
+   (let ((value (funcall fn args)))
+     (if (eql value expected) (format t "Passed~%")
+         (format t "Failed.~%Got ~A, expected ~A~%" value expected)))))
+
+(defun test-potter-kata ()
+  (progn
+   ;; basic
+   (kata-test 'potter-kata '() 0)
+   (kata-test 'potter-kata '(1) 8)
+   (kata-test 'potter-kata '(2) 8)
+   (kata-test 'potter-kata '(3) 8)
+   (kata-test 'potter-kata '(4) 8)
+   (kata-test 'potter-kata '(1 1 1) (* 8 3))
+   ;; simple discounts
+   (kata-test 'potter-kata '(0 1) (* 8 2 .95))
+   (kata-test 'potter-kata '(0 2 4) (* 8 3 .9))
+   (kata-test 'potter-kata '(0 1 2 4) (* 8 4 .8))
+   (kata-test 'potter-kata '(0 1 2 3 4) (* 8 5 .75))
+   ;; several discounts
+   (kata-test 'potter-kata '(0 0 1) (+ 8 (* 8 2 .95)))
+   (kata-test 'potter-kata '(0 0 1 1) (* 2 (* 8 2 .95)))
+   (kata-test 'potter-kata '(0 0 1 2 2 3) (+ (* 8 4 .8) (* 8 2 .95)))
+   (kata-test 'potter-kata '(0 0 1 1 2 3 4) (+ 8 (* 8 5 .75)))
+   ;; edge cases
+   (kata-test 'potter-kata '(0 0 1 1 2 2 3 4) (* 2 (* 8 4 .8)))
+   (kata-test 'potter-kata
+              '(0 0 0 0 0
+                  1 1 1 1 1
+                  2 2 2 2
+                  3 3 3 3 3
+                  4 4 4 4 4)
+              (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75))))))
