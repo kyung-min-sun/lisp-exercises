@@ -115,8 +115,8 @@
              (if (<= (car sorted-books) 0)
                  (potter-kata-helper (cdr sorted-books) (cdr discounts))
                  (let ((best-grouped (+ (* k (car discounts) (car sorted-books))
-                                        (potter-kata-helper 'grouped (cdr discounts))))
-                       (best-ungrouped (potter-kata-helper 'ungrouped (cdr discounts))))
+                                        (potter-kata-helper grouped (cdr discounts))))
+                       (best-ungrouped (potter-kata-helper ungrouped (cdr discounts))))
                    (min best-grouped best-ungrouped)))))))
 
 (defun process-book-list (books)
