@@ -132,7 +132,7 @@
   (progn
    (format t "Testing ~A... " args)
    (let ((value (apply fn args)))
-     (if (eql value expected) (format t "Passed~%")
+     (if (equalp value expected) (format t "Passed~%")
          (format t "Failed.~%Got ~A, expected ~A~%" value expected)))))
 
 (defun test-potter-kata ()
@@ -167,10 +167,15 @@
 (defun two-sum (nums target)
   (let ((cache (make-hash-table :test #'eql)))
     (dolist (num nums)
-      (if (gethash (- target num) cache) (return (values (list num (- target num))))
+      (if (gethash (- target num) cache) (return (values (list (- target num) num)))
           (setf (gethash num cache) num)))))
 
 (defun test-two-sum ()
   (kata-test 'two-sum nil '() 4)
   (kata-test 'two-sum nil '(0) 4)
-  (kata-test 'two-sum '(1 3) '(0 1 7 3) 4))
+  (kata-test 'two-sum '(1 3) '(0 1 7 3) 4)
+  (kata-test 'two-sum '(2 4) '(0 2 1 2 3 8 4) 6)
+  (kata-test 'two-sum '(99 1) '(0 99 1 4) 100)
+  (kata-test 'two-sum '(2 1) '(2 99 99 99 99 99 99 1) 3)
+  (kata-test 'two-sum '(8 12) '(2 4 6 8 10 12) 20)
+  (kata-test 'two-sum nil '(0 99 1 4) 101))
