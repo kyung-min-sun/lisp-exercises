@@ -131,7 +131,7 @@
 (defun kata-test (fn expected &rest args)
   (progn
    (format t "Testing ~A... " args)
-   (let ((value (funcall fn `(,@args))))
+   (let ((value (apply fn args)))
      (if (eql value expected) (format t "Passed~%")
          (format t "Failed.~%Got ~A, expected ~A~%" value expected)))))
 
@@ -157,13 +157,12 @@
    ;; edge cases
    (kata-test 'potter-kata (* 2 (* 8 4 .8)) '(0 0 1 1 2 2 3 4))
    (kata-test 'potter-kata
-     (* 3 (* 8 5 .75))
+     (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75)))
      '(0 0 0 0 0
          1 1 1 1 1
          2 2 2 2
          3 3 3 3 3
-         4 4 4 4)
-     (+ (* 2 (* 8 4 .8))))))
+         4 4 4 4))))
 
 (defun two-sum (nums target)
   (let ((cache (make-hash-table :test #'eql)))
