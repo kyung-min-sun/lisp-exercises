@@ -128,38 +128,50 @@
   (if (null books) 0
       (* 8 (potter-kata-helper (process-book-list books)))))
 
-(defun kata-test (fn args expected)
+(defun kata-test (fn expected &rest args)
   (progn
    (format t "Testing ~A... " args)
-   (let ((value (funcall fn args)))
+   (let ((value (funcall fn `(,@args))))
      (if (eql value expected) (format t "Passed~%")
          (format t "Failed.~%Got ~A, expected ~A~%" value expected)))))
 
 (defun test-potter-kata ()
   (progn
    ;; basic
-   (kata-test 'potter-kata '() 0)
-   (kata-test 'potter-kata '(1) 8)
-   (kata-test 'potter-kata '(2) 8)
-   (kata-test 'potter-kata '(3) 8)
-   (kata-test 'potter-kata '(4) 8)
-   (kata-test 'potter-kata '(1 1 1) (* 8 3))
+   (kata-test 'potter-kata 0 '())
+   (kata-test 'potter-kata 8 '(1))
+   (kata-test 'potter-kata 8 '(2))
+   (kata-test 'potter-kata 8 '(3))
+   (kata-test 'potter-kata 8 '(4))
+   (kata-test 'potter-kata (* 8 3) '(1 1 1))
    ;; simple discounts
-   (kata-test 'potter-kata '(0 1) (* 8 2 .95))
-   (kata-test 'potter-kata '(0 2 4) (* 8 3 .9))
-   (kata-test 'potter-kata '(0 1 2 4) (* 8 4 .8))
-   (kata-test 'potter-kata '(0 1 2 3 4) (* 8 5 .75))
+   (kata-test 'potter-kata (* 8 2 .95) '(0 1))
+   (kata-test 'potter-kata (* 8 3 .9) '(0 2 4))
+   (kata-test 'potter-kata (* 8 4 .8) '(0 1 2 4))
+   (kata-test 'potter-kata (* 8 5 .75) '(0 1 2 3 4))
    ;; several discounts
-   (kata-test 'potter-kata '(0 0 1) (+ 8 (* 8 2 .95)))
-   (kata-test 'potter-kata '(0 0 1 1) (* 2 (* 8 2 .95)))
-   (kata-test 'potter-kata '(0 0 1 2 2 3) (+ (* 8 4 .8) (* 8 2 .95)))
-   (kata-test 'potter-kata '(0 1 1 2 3 4) (+ 8 (* 8 5 .75)))
+   (kata-test 'potter-kata (+ 8 (* 8 2 .95)) '(0 0 1))
+   (kata-test 'potter-kata (* 2 (* 8 2 .95)) '(0 0 1 1))
+   (kata-test 'potter-kata (+ (* 8 4 .8) (* 8 2 .95)) '(0 0 1 2 2 3))
+   (kata-test 'potter-kata (+ 8 (* 8 5 .75)) '(0 1 1 2 3 4))
    ;; edge cases
-   (kata-test 'potter-kata '(0 0 1 1 2 2 3 4) (* 2 (* 8 4 .8)))
+   (kata-test 'potter-kata (* 2 (* 8 4 .8)) '(0 0 1 1 2 2 3 4))
    (kata-test 'potter-kata
-              '(0 0 0 0 0
-                  1 1 1 1 1
-                  2 2 2 2
-                  3 3 3 3 3
-                  4 4 4 4)
-              (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75))))))
+     (* 3 (* 8 5 .75))
+     '(0 0 0 0 0
+         1 1 1 1 1
+         2 2 2 2
+         3 3 3 3 3
+         4 4 4 4)
+     (+ (* 2 (* 8 4 .8))))))
+
+(defun two-sum (nums target)
+  (let ((cache (make-hash-table :test #'eql)))
+    (dolist (num nums)
+      (if (gethash (- target num) cache) (return (values (list num (- target num))))
+          (setf (gethash num cache) num)))))
+
+(defun test-two-sum ()
+  (kata-test 'two-sum nil '() 4)
+  (kata-test 'two-sum nil '(0) 4)
+  (kata-test 'two-sum '(1 3) '(0 1 7 3) 4))
