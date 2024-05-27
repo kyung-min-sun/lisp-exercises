@@ -98,26 +98,25 @@
           (if win val
               (setf (gethash args cache) (apply fn args)))))))
 
-(defun range (n)
-  (loop for i from 0 below n
+(defun range (n &optional (min 0))
+  (loop for i from min below n
         collect i))
 
 (defun potter-kata-helper (books &optional (discounts '(.75 .80 .90 .95)))
   "Solution to discounted Harry Potter book problem. https://codingdojo.org/kata/Potter/"
-  (cond ((null books) 0)
-        ((null discounts) (reduce #'+ books))
-        ((= 1 (length books)) (reduce #'+ books))
-        (t (let ((k (length books))
-                 (sorted-books (sort (copy-list books) #'<))
-                 (grouped (mapcar #'(lambda (x) (- x (car sorted-books))) (cdr sorted-books)))
-                 (ungrouped
-                  (cons (+ (car sorted-books) (cadr sorted-books)) (cddr sorted-books))))
-             (if (<= (car sorted-books) 0)
-                 (potter-kata-helper (cdr sorted-books) (cdr discounts))
-                 (let ((best-grouped (+ (* k (car discounts) (car sorted-books))
-                                        (potter-kata-helper grouped (cdr discounts))))
-                       (best-ungrouped (potter-kata-helper ungrouped (cdr discounts))))
-                   (min best-grouped best-ungrouped)))))))
+  (let* ((k (length books))
+         (sorted-books (sort (copy-list books) #'<))
+         (max-book (car sorted-books)))
+    (cond ((null sorted-books) 0)
+          ((null discounts) (reduce #'+ sorted-books))
+          ((= 1 k) (reduce #'+ sorted-books))
+          ((= 0 max-book) (potter-kata-helper (cdr sorted-books) (cdr discounts)))
+          (t (labels ((iter (n)
+                            (let* ((grouped (mapcar #'(lambda (x) (- x n)) (cdr sorted-books)))
+                                   (shifted (cons (+ (- max-book n) (car grouped)) (cdr grouped))))
+                              (+ (* k (car discounts) n)
+                                 (potter-kata-helper shifted (cdr discounts))))))
+               (reduce #'min (mapcar #'iter (range (+ 1 max-book)))))))))
 
 (defun process-book-list (books)
   (reduce
@@ -154,7 +153,7 @@
    (kata-test 'potter-kata '(0 0 1) (+ 8 (* 8 2 .95)))
    (kata-test 'potter-kata '(0 0 1 1) (* 2 (* 8 2 .95)))
    (kata-test 'potter-kata '(0 0 1 2 2 3) (+ (* 8 4 .8) (* 8 2 .95)))
-   (kata-test 'potter-kata '(0 0 1 1 2 3 4) (+ 8 (* 8 5 .75)))
+   (kata-test 'potter-kata '(0 1 1 2 3 4) (+ 8 (* 8 5 .75)))
    ;; edge cases
    (kata-test 'potter-kata '(0 0 1 1 2 2 3 4) (* 2 (* 8 4 .8)))
    (kata-test 'potter-kata
@@ -162,5 +161,5 @@
                   1 1 1 1 1
                   2 2 2 2
                   3 3 3 3 3
-                  4 4 4 4 4)
+                  4 4 4 4)
               (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75))))))
