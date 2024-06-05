@@ -157,17 +157,18 @@
    ;; edge cases
    (kata-test 'potter-kata (* 2 (* 8 4 .8)) '(0 0 1 1 2 2 3 4))
    (kata-test 'potter-kata
-     (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75)))
-     '(0 0 0 0 0
-         1 1 1 1 1
-         2 2 2 2
-         3 3 3 3 3
-         4 4 4 4))))
+              (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75)))
+              '(0 0 0 0 0
+                  1 1 1 1 1
+                  2 2 2 2
+                  3 3 3 3 3
+                  4 4 4 4))))
 
 (defun two-sum (nums target)
   (let ((cache (make-hash-table :test #'eql)))
     (dolist (num nums)
-      (if (gethash (- target num) cache) (return (values (list (- target num) num)))
+      (if (gethash (- target num) cache)
+          (return (values (list (- target num) num)))
           (setf (gethash num cache) num)))))
 
 (defun test-two-sum ()
