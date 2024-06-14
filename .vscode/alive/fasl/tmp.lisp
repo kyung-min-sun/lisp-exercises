@@ -157,14 +157,15 @@
    ;; edge cases
    (kata-test 'potter-kata (* 2 (* 8 4 .8)) '(0 0 1 1 2 2 3 4))
    (kata-test 'potter-kata
-              (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75)))
-              '(0 0 0 0 0
-                  1 1 1 1 1
-                  2 2 2 2
-                  3 3 3 3 3
-                  4 4 4 4))))
+     (+ (* 2 (* 8 4 .8)) (* 3 (* 8 5 .75)))
+     '(0 0 0 0 0
+         1 1 1 1 1
+         2 2 2 2
+         3 3 3 3 3
+         4 4 4 4))))
 
 (defun two-sum (nums target)
+  "Implementation of two sum problem."
   (let ((cache (make-hash-table :test #'eql)))
     (dolist (num nums)
       (if (gethash (- target num) cache)
@@ -180,3 +181,23 @@
   (kata-test 'two-sum '(2 1) '(2 99 99 99 99 99 99 1) 3)
   (kata-test 'two-sum '(8 12) '(2 4 6 8 10 12) 20)
   (kata-test 'two-sum nil '(0 99 1 4) 101))
+
+(defun is-palindrome (str &optional (i 0))
+  (let ((len (length str)))
+    (cond
+     ((eql 0 len) t)
+     ((eql 1 len) t)
+     ((> i (/ len 2)) t)
+     (t
+       (and (is-palindrome str (1+ i)) (eql (char str i) (char str (- len (+ 1 i)))))))))
+
+
+(defun test-is-palindrome ()
+  (kata-test 'is-palindrome t "")
+  (kata-test 'is-palindrome t "aa")
+  (kata-test 'is-palindrome nil "ab")
+  (kata-test 'is-palindrome t "aba")
+  (kata-test 'is-palindrome t "daad")
+  (kata-test 'is-palindrome t "twowt")
+  (kata-test 'is-palindrome t "121")
+  (kata-test 'is-palindrome t "12321"))
